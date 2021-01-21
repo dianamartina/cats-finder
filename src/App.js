@@ -1,25 +1,44 @@
-import logo from './logo.svg';
+import React from 'react';
+import CardList from './components/card-list/card-list.component';
+import SearchBox from'./components/search-box/search-box.component';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      cats: [],
+      searchField:''
+    }
+  }
+  componentDidMount() {
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then(response => response.json())
+    .then(users => this.setState({cats: users}));
+  }
+
+  handleChange(event) {
+    let item = event.target.value;
+    // console.log(item);
+    this.setState({searchField: item})
+  }
+
+  render() {
+    const {cats, searchField } = this.state;
+    const filteredCats = cats.filter((cat) => cat.name.toLowerCase().includes(searchField.toLocaleLowerCase()) )
+  //  console.log(filteredCats);
+    return (
+      <div className="App">
+        <h1> Cats Finder</h1>
+          <SearchBox placeholder="Find cats" handleChange={(event)=>this.handleChange(event)}/>
+          {
+            filteredCats.length !== 0
+            ? <CardList cats={filteredCats}/>
+            : <h3>No cats here!</h3>
+          }
+      </div>
+    );
+  }
 }
 
 export default App;
